@@ -38,7 +38,7 @@ namespace TimeEdit
 		/// </summary>
 		/// <param name="searchText">A search query.</param>
 		/// <param name="types">Type ids for filtering the search.</param>
-		private string SearchURL(string searchText, params int[] types) => $"{BaseURL}sid=3&partajax=t&search_text={searchText}&types={String.Join(',', types)}";
+		private string SearchURL(string searchText, params int[] types) => $"{BaseURL}objects.json?sid=3&partajax=t&search_text={searchText}&types={String.Join(',', types)}";
 
 		/// <summary>
 		/// Creates a new <see cref="TimeEdit"/> object for retrieving
@@ -73,11 +73,23 @@ namespace TimeEdit
 		/// <summary>
 		/// Fetches and returns a list of all avalible <see cref="ScheduleType"/>'s.
 		/// </summary>
-		public async Task<ImmutableList<ScheduleType>> GetScheduleTypes()
+		public async Task<IImmutableList<ScheduleType>> GetScheduleTypes()
 		{
 			XElement json = await LoadURL(TypesURL());
 
 			return json.XPathSelectElement("//records").Elements().Select(x => new ScheduleType(x.XPathSelectElement("name").Value, int.Parse(x.XPathSelectElement("id").Value))).ToImmutableList();
+		}
+
+		/// <summary>
+		/// Performs a search with filters and returns the results.
+		/// </summary>
+		/// <param name="query">A search query.</param>
+		/// <param name="types">A list of type id's for filtering the results.</param>
+		public async Task<IImmutableList<SearchItem>> Search(string query, params int[] types)
+		{
+			XElement json = await LoadURL(SearchURL(query, types));
+
+			return json.XPathSelectElement("//records").Elements().Select(x => new SearchItem(int.Parse(x.XPathSelectElement("id").Value), int.Parse(x.XPathSelectElement("typeId").Value), x.XPathSelectElement("values").Value)).ToImmutableList();
 		}
 	}
 }
