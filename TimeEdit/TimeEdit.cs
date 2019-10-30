@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.Serialization.Json;
 using System.Xml;
+using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace TimeEdit
 {
@@ -20,22 +23,21 @@ namespace TimeEdit
 		public string BaseURL { get; }
 
 		/// <summary>
-		/// Cached value for faster access.
+		/// Creates a URL that loads the different types of objects.
 		/// </summary>
-		private string searchPageURL;
-
+		private string TypesURL() => $"{BaseURL}types.json";
 		/// <summary>
 		/// Creates a URL that loads the schedule for the specified course id.
 		/// </summary>
 		/// <param name="courseId">The id of a course.</param>
-		private string CourseURL(int courseId) => $"{BaseURL}ri.json?h=f&sid=3&p=0.m%2C12.n&objects={courseId}&ox=0&types=0&fe=0&h2=f";
+		private string CourseURL(int courseId) => $"{BaseURL}ri.json?sid=3&objects={courseId}";
 		/// <summary>
 		/// Creates a URL that loads the search results for the specified query
 		/// and filtering types.
 		/// </summary>
 		/// <param name="searchText">A search query.</param>
 		/// <param name="types">Type ids for filtering the search.</param>
-		private string SearchURL(string searchText, int types) => $"{BaseURL}objects.html?max=1&fr=t&partajax=t&im=f&sid=3&l=nb_NO&search_text={searchText}&types={types}";
+		private string SearchURL(string searchText, params int[] types) => $"{BaseURL}sid=3&partajax=t&search_text={searchText}&types={String.Join(',', types)}";
 
 		/// <summary>
 		/// Creates a new <see cref="TimeEdit"/> object for retrieving
@@ -54,72 +56,12 @@ namespace TimeEdit
 
 		/// <summary>
 		/// Loads the content of a remote URL and returns a
-		/// <see cref="XmlReader"/> ready to parse the response.
+		/// <see cref="XElement"/> for parsing the response.
 		/// </summary>
 		/// <param name="URL">A URL which content to download.</param>
-		private async Task<XmlReader> LoadURL(string URL)
+		private async Task<XElement> LoadURL(string URL)
 		{
-			using (HttpClient client = new HttpClient())
-			{
-				Stream srcStream = await client.GetStreamAsync(URL);
-
-				return XmlReader.Create(srcStream);
-			}
-		}
-
-		/// <summary>
-		/// Gets (or loads) the URL of the search page.
-		/// </summary>
-		private async Task<string> GetSearchPageURL()
-		{
-			if (searchPageURL == null)
-			{
-				searchPageURL = await LoadSearchpageURL();
-			}
-
-			return searchPageURL;
-		}
-		/// <summary>
-		/// Loads the URL of the search page.
-		/// </summary>
-		private async Task<string> LoadSearchpageURL()
-		{
-			using (XmlReader reader = await LoadURL(BaseURL))
-			{
-				// CSS selector ".leftlistcolumn > a:first-of-type"
-
-				try
-				{
-					bool foundLeftListColumn = reader.ReadToFollowing(r => r.GetAttribute("class")?.Split(" ").Contains("leftlistcolumn") ?? false, XmlNodeType.Element);
-					if (!foundLeftListColumn)
-					{
-						return null;
-					}
-
-					bool foundA = reader.ReadToDescendant("a");
-					if (!foundA)
-					{
-						return null;
-					}
-				}
-				catch (XmlException)
-				{
-					return null;
-				}
-
-				string href = reader.GetAttribute("href");
-
-				if (href != null)
-				{
-					Match result = Regex.Match(href, @"[^/]*\.html$");
-					if (result.Success)
-					{
-						return result.Value;
-					}
-				}
-			}
-
-			return null;
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -127,34 +69,7 @@ namespace TimeEdit
 		/// </summary>
 		public async Task<IReadOnlyList<ScheduleType>> GetScheduleTypes()
 		{
-			string searchPageURL = await GetSearchPageURL();
-
-			List<ScheduleType> scheduleTypes = new List<ScheduleType>();
-
-			using (XmlReader reader = await LoadURL(BaseURL + searchPageURL))
-			{
-				try
-				{
-					reader.ReadToFollowing(r => r.GetAttribute("name") == "fancytypeselector", XmlNodeType.Element);
-					int optionsDepth = reader.Depth + 1;
-
-					while (reader.Read() && reader.Depth == optionsDepth)
-					{
-						if (reader.NodeType == XmlNodeType.Element)
-						{
-							scheduleTypes.Add(
-								new ScheduleType(
-									reader.ReadContentAsString(),
-									int.Parse(reader.GetAttribute("value"))
-								)
-							);
-						}
-					}
-				}
-				catch (XmlException) { }
-			}
-
-			return scheduleTypes.AsReadOnly();
+			throw new NotImplementedException();
 		}
 	}
 }
