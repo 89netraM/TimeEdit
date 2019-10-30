@@ -61,7 +61,12 @@ namespace TimeEdit
 		/// <param name="URL">A URL which content to download.</param>
 		private async Task<XElement> LoadURL(string URL)
 		{
-			throw new NotImplementedException();
+			using (HttpClient client = new HttpClient())
+			{
+				Stream srcStream = await client.GetStreamAsync(URL);
+				XmlDictionaryReader jsonReader = JsonReaderWriterFactory.CreateJsonReader(srcStream, new XmlDictionaryReaderQuotas());
+				return XElement.Load(jsonReader);
+			}
 		}
 
 		/// <summary>
