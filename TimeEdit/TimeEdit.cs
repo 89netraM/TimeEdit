@@ -1,3 +1,4 @@
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -101,7 +102,7 @@ namespace TimeEdit
 						return null;
 					}
 				}
-				catch
+				catch (XmlException)
 				{
 					return null;
 				}
@@ -119,6 +120,41 @@ namespace TimeEdit
 			}
 
 			return null;
+		}
+
+		/// <summary>
+		/// Fetches and returns a list of all avalible <see cref="ScheduleType"/>'s.
+		/// </summary>
+		public async Task<IReadOnlyList<ScheduleType>> GetScheduleTypes()
+		{
+			string searchPageURL = await GetSearchPageURL();
+
+			List<ScheduleType> scheduleTypes = new List<ScheduleType>();
+
+			using (XmlReader reader = await LoadURL(BaseURL + searchPageURL))
+			{
+				try
+				{
+					reader.ReadToFollowing(r => r.GetAttribute("name") == "fancytypeselector", XmlNodeType.Element);
+					int optionsDepth = reader.Depth + 1;
+
+					while (reader.Read() && reader.Depth == optionsDepth)
+					{
+						if (reader.NodeType == XmlNodeType.Element)
+						{
+							scheduleTypes.Add(
+								new ScheduleType(
+									reader.ReadContentAsString(),
+									int.Parse(reader.GetAttribute("value"))
+								)
+							);
+						}
+					}
+				}
+				catch (XmlException) { }
+			}
+
+			return scheduleTypes.AsReadOnly();
 		}
 	}
 }
