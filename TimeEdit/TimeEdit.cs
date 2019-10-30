@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -72,9 +73,11 @@ namespace TimeEdit
 		/// <summary>
 		/// Fetches and returns a list of all avalible <see cref="ScheduleType"/>'s.
 		/// </summary>
-		public async Task<IReadOnlyList<ScheduleType>> GetScheduleTypes()
+		public async Task<ImmutableList<ScheduleType>> GetScheduleTypes()
 		{
-			throw new NotImplementedException();
+			XElement json = await LoadURL(TypesURL());
+
+			return json.XPathSelectElement("//records").Elements().Select(x => new ScheduleType(x.XPathSelectElement("name").Value, int.Parse(x.XPathSelectElement("id").Value))).ToImmutableList();
 		}
 	}
 }
