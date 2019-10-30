@@ -1,5 +1,7 @@
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
 
@@ -16,6 +18,9 @@ namespace TimeEdit
 		/// </summary>
 		public string BaseURL { get; }
 
+		/// <summary>
+		/// Cached value for faster access.
+		/// </summary>
 		private string searchPageURL;
 
 		/// <summary>
@@ -59,6 +64,61 @@ namespace TimeEdit
 
 				return XmlReader.Create(srcStream);
 			}
+		}
+
+		/// <summary>
+		/// Gets (or loads) the URL of the search page.
+		/// </summary>
+		private async Task<string> GetSearchPageURL()
+		{
+			if (searchPageURL == null)
+			{
+				searchPageURL = await LoadSearchpageURL();
+			}
+
+			return searchPageURL;
+		}
+		/// <summary>
+		/// Loads the URL of the search page.
+		/// </summary>
+		private async Task<string> LoadSearchpageURL()
+		{
+			using (XmlReader reader = await LoadURL(BaseURL))
+			{
+				// CSS selector ".leftlistcolumn > a:first-of-type"
+
+				try
+				{
+					bool foundLeftListColumn = reader.ReadToFollowing(r => r.GetAttribute("class")?.Split(" ").Contains("leftlistcolumn") ?? false, XmlNodeType.Element);
+					if (!foundLeftListColumn)
+					{
+						return null;
+					}
+
+					bool foundA = reader.ReadToDescendant("a");
+					if (!foundA)
+					{
+						return null;
+					}
+				}
+				catch
+				{
+					return null;
+				}
+
+				string href = reader.GetAttribute("href");
+
+				if (href != null)
+				{
+					Match result = Regex.Match(href, @"[^/]*\.html$");
+					if (result.Success)
+					{
+						return result.Value;
+					}
+				}
+			}
+
+			return null;
 		}
 	}
 }
