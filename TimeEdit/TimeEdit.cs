@@ -28,10 +28,10 @@ namespace TimeEdit
 		/// </summary>
 		private string TypesURL() => $"{BaseURL}types.json";
 		/// <summary>
-		/// Creates a URL that loads the schedule for the specified course id.
+		/// Creates a URL that loads the schedule for the specified schedule id.
 		/// </summary>
-		/// <param name="courseId">The id of a course.</param>
-		private string CourseURL(int courseId) => $"{BaseURL}ri.json?sid=3&objects={courseId}";
+		/// <param name="courseId">The id of a schedule.</param>
+		private string ScheduleURL(int courseId) => $"{BaseURL}ri.json?sid=3&objects={courseId}";
 		/// <summary>
 		/// Creates a URL that loads the search results for the specified query
 		/// and filtering types.
@@ -90,6 +90,30 @@ namespace TimeEdit
 			XElement json = await LoadURL(SearchURL(query, types));
 
 			return json.XPathSelectElement("//records").Elements().Select(x => new SearchItem(int.Parse(x.XPathSelectElement("id").Value), int.Parse(x.XPathSelectElement("typeId").Value), x.XPathSelectElement("values").Value)).ToImmutableList();
+		}
+
+		/// <summary>
+		/// Returns a list of all avalible reservations of the specified ids
+		/// schedule.
+		/// </summary>
+		/// <param name="scheduleId">The id of a schedule.</param>
+		public async Task<IImmutableList<ScheduleEntry>> GetSchedule(int scheduleId)
+		{
+			XElement json = await LoadURL(ScheduleURL(scheduleId));
+
+			IImmutableList<string> columnNames = json.XPathSelectElement("//columnheaders").Elements().Select(x => x.Value).ToImmutableList();
+
+			return json.XPathSelectElement("//reservations").Elements().Select(reservation =>
+			{
+				string id = reservation.XPathSelectElement("id").Value;
+				string startTime = reservation.XPathSelectElement("startdate").Value + "T" + reservation.XPathSelectElement("starttime").Value;
+				string endTime = reservation.XPathSelectElement("enddate").Value + "T" + reservation.XPathSelectElement("endtime").Value;
+
+				IImmutableList<string[]> columnValues = reservation.XPathSelectElement("columns").Elements().Select(x => x.Value.Split(", ")).ToImmutableList();
+				IImmutableDictionary<string, string[]> columns = columnNames.Zip(columnValues, (k, v) => new { k, v }).ToImmutableDictionary(x => x.k, x => x.v);
+
+				return new ScheduleEntry(id, DateTime.Parse(startTime), DateTime.Parse(endTime), columns);
+			}).ToImmutableList();
 		}
 	}
 }
