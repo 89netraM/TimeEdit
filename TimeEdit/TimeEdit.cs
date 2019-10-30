@@ -44,7 +44,21 @@ namespace TimeEdit
 		public TimeEdit(string baseURL)
 		{
 			BaseURL = baseURL;
+		}
 
+		/// <summary>
+		/// Loads the content of a remote URL and returns a
+		/// <see cref="XmlReader"/> ready to parse the response.
+		/// </summary>
+		/// <param name="URL">A URL which content to download.</param>
+		private async Task<XmlReader> LoadURL(string URL)
+		{
+			using (HttpClient client = new HttpClient())
+			{
+				Stream srcStream = await client.GetStreamAsync(URL);
+
+				return XmlReader.Create(srcStream);
+			}
 		}
 	}
 }
