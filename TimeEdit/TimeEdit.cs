@@ -97,13 +97,13 @@ namespace TimeEdit
 		/// schedule.
 		/// </summary>
 		/// <param name="scheduleId">The id of a schedule.</param>
-		public async Task<IImmutableList<ScheduleEntry>> GetSchedule(int scheduleId)
+		public async Task<Schedule> GetSchedule(int scheduleId)
 		{
 			XElement json = await LoadURL(ScheduleURL(scheduleId));
 
 			IImmutableList<string> columnNames = json.XPathSelectElement("//columnheaders").Elements().Select(x => x.Value).ToImmutableList();
 
-			return json.XPathSelectElement("//reservations").Elements().Select(reservation =>
+			IImmutableList<ScheduleEntry> entries = json.XPathSelectElement("//reservations").Elements().Select(reservation =>
 			{
 				string id = reservation.XPathSelectElement("id").Value;
 				string startTime = reservation.XPathSelectElement("startdate").Value + "T" + reservation.XPathSelectElement("starttime").Value;
@@ -114,6 +114,8 @@ namespace TimeEdit
 
 				return new ScheduleEntry(id, DateTime.Parse(startTime), DateTime.Parse(endTime), columns);
 			}).ToImmutableList();
+
+			return new Schedule(columnNames, entries);
 		}
 	}
 }
