@@ -2,6 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageProjectUrl>https://github.com/89netraM/TimeEdit</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/89netraM/TimeEdit</RepositoryUrl>
+    <RepositoryType>GitHub</RepositoryType>
+    <Company>MoreTec</Company>
+    <Authors>Mårten Åsberg</Authors>
+    <PackageId>TimeEditApi</PackageId>
+    <Product>TimeEdit API</Product>
+    <Description>A simple .NET library for retrieving schedules from TimeEdit.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Copyright>Copyright (c) 2019 Mårten Åsberg</Copyright>
+    <PackageTags>TimeEdit</PackageTags>
   </PropertyGroup>
 
 </Project>
