@@ -17,5 +17,38 @@ namespace MoreTec.TimeEditApi
 			EndTime = endTime;
 			Columns = columns;
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+			{
+				return false;
+			}
+
+			if (!(obj is ScheduleEntry other))
+			{
+				return false;
+			}
+			else
+			{
+				return this == other;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return Id.GetHashCode();
+		}
+
+		public static bool operator ==(ScheduleEntry left, ScheduleEntry right)
+		{
+			return left.Id == right.Id && left.StartTime == right.StartTime &&
+				left.EndTime == right.EndTime && left.Columns.Equals(right.Columns);
+		}
+
+		public static bool operator !=(ScheduleEntry left, ScheduleEntry right)
+		{
+			return !(left == right);
+		}
 	}
 }
