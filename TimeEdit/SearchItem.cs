@@ -12,5 +12,37 @@
 			TypeId = typeId;
 			Name = name;
 		}
+
+		public override bool Equals(object obj)
+		{
+			if (obj == null)
+			{
+				return false;
+			}
+
+			if (!(obj is SearchItem other))
+			{
+				return false;
+			}
+			else
+			{
+				return this == other;
+			}
+		}
+
+		public override int GetHashCode()
+		{
+			return Id + TypeId + Name.GetHashCode();
+		}
+
+		public static bool operator ==(SearchItem left, SearchItem right)
+		{
+			return left.Id == right.Id && left.TypeId == right.TypeId && left.Name == right.Name;
+		}
+
+		public static bool operator !=(SearchItem left, SearchItem right)
+		{
+			return !(left == right);
+		}
 	}
 }
