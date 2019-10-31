@@ -10,7 +10,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace TimeEdit
+namespace MoreTec.TimeEditApi
 {
 	/// <summary>
 	/// Represents a <see cref="TimeEdit"/> object that can retrieve schedules

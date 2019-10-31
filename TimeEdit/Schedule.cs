@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace TimeEdit
+namespace MoreTec.TimeEditApi
 {
 	public readonly struct Schedule
 	{

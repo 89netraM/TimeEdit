@@ -1,4 +1,4 @@
-﻿namespace TimeEdit
+﻿namespace MoreTec.TimeEditApi
 {
 	public readonly struct SearchItem
 	{
