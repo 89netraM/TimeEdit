@@ -1,4 +1,4 @@
-![GitHub Last commit](https://img.shields.io/github/last-commit/89netraM/TimeEdit) ![GitHub License](https://img.shields.io/github/license/89netraM/TimeEdit) ![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey) ![Nuget Version](https://img.shields.io/nuget/v/TimeEditApi) ![Nuget Downloads](https://img.shields.io/nuget/dt/TimeEditApi)
+[![GitHub Last commit](https://img.shields.io/github/last-commit/89netraM/TimeEdit)](https://github.com/89netraM/TimeEdit/commits) [![GitHub License](https://img.shields.io/github/license/89netraM/TimeEdit)](./LICENSE) ![Platform](https://img.shields.io/badge/platform-windows%20%7C%20macos%20%7C%20linux-lightgrey) [![Nuget Version](https://img.shields.io/nuget/v/TimeEditApi)](https://www.nuget.org/packages/TimeEditApi) [![Nuget Downloads](https://img.shields.io/nuget/dt/TimeEditApi)](https://www.nuget.org/packages/TimeEditApi)
 
 # TimeEdit
 
